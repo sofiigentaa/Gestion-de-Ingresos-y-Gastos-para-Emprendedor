@@ -1,0 +1,6 @@
+{
+  "name": "GER-MANIA - Trabajos en Madera",
+  "description": "Sistema de gestión de ingresos y egresos para GER-MANIA Trabajos en Madera. Registro de insumos, ferias y ventas personalizadas.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
