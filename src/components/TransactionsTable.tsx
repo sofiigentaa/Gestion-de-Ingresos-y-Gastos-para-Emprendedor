@@ -389,8 +389,8 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
                 <th className="px-5 py-3.5">Tipo</th>
                 <th className="px-5 py-3.5">Concepto / Detalle</th>
                 <th className="px-5 py-3.5">Categoría / Subcategoría</th>
-                <th className="px-5 py-3.5">Medio de Pago</th>
-                <th className="px-5 py-3.5">Proveedor / Cliente</th>
+                <th className="px-5 py-3.5 hidden 2xl:table-cell">Medio de Pago</th>
+                <th className="px-5 py-3.5 hidden 2xl:table-cell">Proveedor / Cliente</th>
                 <th className="px-5 py-3.5 text-right">Monto</th>
                 <th className="px-4 py-3.5 text-center">Acciones</th>
               </tr>
@@ -421,6 +421,11 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
                       {tx.receiptNumber && (
                         <p className="text-[10px] text-slate-400 font-mono mt-0.5">Comprobante: {tx.receiptNumber}</p>
                       )}
+                      {/* En pantallas medianas, medio de pago y proveedor van acá para que no se corte el monto */}
+                      <p className="2xl:hidden text-[10px] text-slate-500 mt-0.5 capitalize">
+                        {tx.paymentMethod.replace('_', ' ')}
+                        {tx.supplierOrClient ? ` · ${tx.supplierOrClient}` : ''}
+                      </p>
                     </td>
                     <td className="px-5 py-4 whitespace-nowrap">
                       <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-bold border ${getCategoryBadgeClass(tx.categoryId, tx.type)}`}>
@@ -433,10 +438,10 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
                         </span>
                       )}
                     </td>
-                    <td className="px-5 py-4 whitespace-nowrap capitalize text-slate-600">
+                    <td className="px-5 py-4 whitespace-nowrap capitalize text-slate-600 hidden 2xl:table-cell">
                       {tx.paymentMethod.replace('_', ' ')}
                     </td>
-                    <td className="px-5 py-4 whitespace-nowrap text-slate-600">
+                    <td className="px-5 py-4 whitespace-nowrap text-slate-600 hidden 2xl:table-cell">
                       {tx.supplierOrClient || '-'}
                     </td>
                     <td className="px-5 py-4 text-right font-extrabold font-mono text-sm whitespace-nowrap">
