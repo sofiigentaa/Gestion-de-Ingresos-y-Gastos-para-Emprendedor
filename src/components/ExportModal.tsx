@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { X, FileSpreadsheet, Download, Upload, Printer, RotateCcw, Database } from 'lucide-react';
 import { Transaction, CategoryOption } from '../types';
-import { exportTransactionsToCSV, exportBackupJSON } from '../utils/storage';
+import { exportTransactionsToCSV, exportBackupJSON, parseBackup } from '../utils/storage';
 import { formatCurrency, getMonthLabel } from '../utils/formatters';
 
 interface ExportModalProps {
@@ -51,18 +51,17 @@ export const ExportModal: React.FC<ExportModalProps> = ({
     reader.onload = (event) => {
       try {
         const content = event.target?.result as string;
-        const parsed = JSON.parse(content);
-        if (parsed && Array.isArray(parsed.transactions)) {
-          onRestoreBackup(parsed.transactions, parsed.categories);
-          alert('¡Copia de seguridad restaurada con éxito!');
-          onClose();
-        } else if (Array.isArray(parsed)) {
-          onRestoreBackup(parsed);
-          alert('¡Copia de seguridad restaurada con éxito!');
-          onClose();
-        } else {
-          alert('El archivo no contiene un formato de respaldo válido.');
+        const result = parseBackup(JSON.parse(content));
+        if ('error' in result) {
+          alert(result.error);
+          return;
         }
+        if (!window.confirm(`Se van a reemplazar todos los movimientos actuales por los ${result.transactions.length} del respaldo. ¿Continuar?`)) {
+          return;
+        }
+        onRestoreBackup(result.transactions, result.categories);
+        alert('¡Copia de seguridad restaurada con éxito!');
+        onClose();
       } catch (err) {
         alert('Error al leer el archivo JSON.');
       }

@@ -11,8 +11,14 @@ import {
   isSupabaseConfigured,
   fetchTransactionsFromSupabase,
   syncTransactionToSupabase,
-  deleteTransactionFromSupabase
+  deleteTransactionFromSupabase,
+  replaceAllTransactionsInSupabase,
+  fetchCategoriesFromSupabase,
+  saveCategoriesToSupabase,
+  signOut,
+  Result,
 } from './lib/supabase';
+import { BRAND } from './config/brand';
 import { 
   getCurrentMonthKey, 
   getTodayDateString, 
@@ -30,7 +36,6 @@ import { ExportModal } from './components/ExportModal';
 import { ResetDataModal } from './components/ResetDataModal';
 import { getSampleTransactions } from './data/sampleTransactions';
 import { DEFAULT_CATEGORIES } from './data/initialCategories';
-import germaniaLogo from './assets/images/germania_logo_1787747352294.jpg';
 import { 
   LayoutDashboard, 
   CalendarDays,
@@ -45,12 +50,18 @@ import {
   Menu, 
   X,
   Phone,
-  Hammer
+  Hammer,
+  LogOut,
+  AlertTriangle
 } from 'lucide-react';
 
 export default function App() {
-  const [transactions, setTransactions] = useState<Transaction[]>(() => loadTransactions());
-  const [categories, setCategories] = useState<CategoryOption[]>(() => loadCategories());
+  // En modo nube los datos salen de Supabase (nunca los de ejemplo ni los
+  // guardados en el navegador); en modo local, del navegador.
+  const [transactions, setTransactions] = useState<Transaction[]>(() => (isSupabaseConfigured ? [] : loadTransactions()));
+  const [categories, setCategories] = useState<CategoryOption[]>(() => (isSupabaseConfigured ? DEFAULT_CATEGORIES : loadCategories()));
+  const [cloudLoaded, setCloudLoaded] = useState<boolean>(!isSupabaseConfigured);
+  const [syncError, setSyncError] = useState<string | null>(null);
   const currencySymbol = '$'; // Pesos argentinos únicamente
   const [selectedMonth, setSelectedMonth] = useState<string>(() => getCurrentMonthKey());
   const [selectedDate, setSelectedDate] = useState<string>(() => getTodayDateString());
@@ -65,25 +76,49 @@ export default function App() {
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
 
-  // Sync to local storage
+  // Modo local: se guarda en el navegador
   useEffect(() => {
-    saveTransactions(transactions);
+    if (!isSupabaseConfigured) saveTransactions(transactions);
   }, [transactions]);
 
   useEffect(() => {
-    saveCategories(categories);
+    if (!isSupabaseConfigured) saveCategories(categories);
   }, [categories]);
 
-  // Load from Supabase if configured
-  useEffect(() => {
-    if (isSupabaseConfigured) {
-      fetchTransactionsFromSupabase().then((remoteTx) => {
-        if (remoteTx && remoteTx.length > 0) {
-          setTransactions(remoteTx);
-        }
-      });
-    }
+  // Modo nube: carga inicial desde Supabase
+  const reloadFromCloud = React.useCallback(async () => {
+    if (!isSupabaseConfigured) return;
+    const [txRes, catRes] = await Promise.all([fetchTransactionsFromSupabase(), fetchCategoriesFromSupabase()]);
+    if (txRes.ok) setTransactions(txRes.data || []);
+    else setSyncError(txRes.error || 'No se pudieron leer los datos.');
+    if (catRes.ok && catRes.data) setCategories(catRes.data);
+    else if (!catRes.ok) setSyncError(catRes.error || 'No se pudieron leer las categorías.');
+    setCloudLoaded(true);
   }, []);
+
+  useEffect(() => {
+    reloadFromCloud();
+  }, [reloadFromCloud]);
+
+  // Si un guardado en la nube falla, se avisa y se vuelve a leer lo que hay allá
+  // (antes fallaba en silencio y la pantalla mostraba datos que no estaban guardados).
+  const handleCloudResult = (result: Result) => {
+    if (!result.ok) {
+      setSyncError(result.error || 'No se pudo guardar en la nube.');
+      reloadFromCloud();
+    }
+  };
+
+  useEffect(() => {
+    if (!syncError) return;
+    const t = setTimeout(() => setSyncError(null), 8000);
+    return () => clearTimeout(t);
+  }, [syncError]);
+
+  const updateCategories = (next: CategoryOption[]) => {
+    setCategories(next);
+    if (isSupabaseConfigured) saveCategoriesToSupabase(next).then(handleCloudResult);
+  };
 
   const handlePrevMonth = () => {
     const [year, month] = selectedMonth.split('-').map(Number);
@@ -123,7 +158,7 @@ export default function App() {
   const handleDeleteTx = (id: string) => {
     if (window.confirm('¿Estás seguro de que deseas eliminar este registro?')) {
       setTransactions((prev) => prev.filter((t) => t.id !== id));
-      deleteTransactionFromSupabase(id);
+      deleteTransactionFromSupabase(id).then(handleCloudResult);
     }
   };
 
@@ -141,7 +176,7 @@ export default function App() {
       setTransactions((prev) =>
         prev.map((t) => (t.id === editingId ? updatedTx : t))
       );
-      syncTransactionToSupabase(updatedTx);
+      syncTransactionToSupabase(updatedTx).then(handleCloudResult);
     } else {
       const newTx: Transaction = {
         ...txData,
@@ -149,7 +184,7 @@ export default function App() {
         createdAt: Date.now(),
       };
       setTransactions((prev) => [newTx, ...prev]);
-      syncTransactionToSupabase(newTx);
+      syncTransactionToSupabase(newTx).then(handleCloudResult);
 
       const txMonth = txData.date.slice(0, 7);
       if (txMonth !== selectedMonth) {
@@ -158,27 +193,31 @@ export default function App() {
     }
   };
 
+  // Restaurar / restablecer también se aplica en la nube (antes solo en el
+  // navegador y los datos viejos reaparecían al recargar).
+  const replaceAll = (list: Transaction[]) => {
+    setTransactions(list);
+    if (isSupabaseConfigured) replaceAllTransactionsInSupabase(list).then(handleCloudResult);
+    else saveTransactions(list);
+  };
+
   const handleRestoreBackup = (newTxList: Transaction[], newCategories?: CategoryOption[]) => {
-    setTransactions(newTxList);
+    replaceAll(newTxList);
     if (newCategories && newCategories.length > 0) {
-      setCategories(newCategories);
+      updateCategories(newCategories);
     }
   };
 
   const handleResetToEmpty = () => {
-    setTransactions([]);
-    saveTransactions([]);
+    replaceAll([]);
   };
 
   const handleResetToSample = () => {
-    const sample = getSampleTransactions();
-    setTransactions(sample);
-    saveTransactions(sample);
+    replaceAll(getSampleTransactions());
   };
 
   const handleResetCategories = () => {
-    setCategories(DEFAULT_CATEGORIES);
-    saveCategories(DEFAULT_CATEGORIES);
+    updateCategories(DEFAULT_CATEGORIES);
   };
 
   const handleDateChangeFromDaily = (newDate: string) => {
@@ -235,21 +274,21 @@ export default function App() {
           isMobileMenuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
         }`}
       >
-        {/* GER-MANIA Brand Header with Woodcraft Logo */}
+        {/* Marca del negocio (src/config/brand.ts) */}
         <div className="p-5 border-b border-slate-800/80 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img 
-              src={germaniaLogo} 
-              alt="GER-MANIA Logo" 
+              src={BRAND.logo} 
+              alt={`${BRAND.name} Logo`} 
               referrerPolicy="no-referrer"
               className="w-11 h-11 rounded-xl object-cover border border-slate-700/80 shadow-md shadow-amber-950/20 shrink-0"
             />
             <div className="min-w-0">
               <h2 className="text-base font-extrabold tracking-tight text-white uppercase leading-tight truncate">
-                GER-MANIA
+                {BRAND.name}
               </h2>
               <p className="text-[10px] text-amber-400 font-bold uppercase tracking-widest leading-tight mt-0.5">
-                Trabajos en Madera
+                {BRAND.tagline}
               </p>
             </div>
           </div>
@@ -381,6 +420,18 @@ export default function App() {
             <RotateCcw className="w-4 h-4 shrink-0 text-amber-400" />
             <span>Restablecer Datos</span>
           </button>
+
+          {isSupabaseConfigured && (
+            <button
+              onClick={() => signOut()}
+              id="nav-logout"
+              className="w-full flex items-center space-x-3 p-3 rounded-xl transition-all text-left text-sm text-slate-400 hover:text-white hover:bg-slate-800/60"
+            >
+              <span className="w-2 h-2 rounded-full bg-slate-600" />
+              <LogOut className="w-4 h-4 shrink-0 text-slate-400" />
+              <span>Cerrar sesión</span>
+            </button>
+          )}
         </nav>
 
         {/* Sidebar Monthly Balance Box */}
@@ -435,7 +486,7 @@ export default function App() {
               <Menu className="w-5 h-5" />
             </button>
             <div className="flex flex-col">
-              <h1 className="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight">
+              <h1 className="text-lg sm:text-2xl font-bold text-slate-800 tracking-tight leading-tight">
                 {viewTitles[currentView]?.title || 'Vista General'}
               </h1>
               <p className="text-xs sm:text-sm text-slate-500 hidden sm:block">
@@ -470,8 +521,8 @@ export default function App() {
               </button>
             </div>
 
-            {/* Quick Action Buttons - Ingreso first, then Egreso */}
-            <div className="flex items-center space-x-1.5 sm:space-x-2">
+            {/* Quick Action Buttons - Ingreso first, then Egreso (en celular se usa el + de abajo) */}
+            <div className="hidden sm:flex items-center space-x-1.5 sm:space-x-2">
               <button
                 onClick={() => handleOpenAddTx('ingreso')}
                 id="btn-header-add-income"
@@ -491,6 +542,20 @@ export default function App() {
             </div>
           </div>
         </header>
+
+        {/* Aviso de error de la nube */}
+        {syncError && (
+          <div role="alert" className="mx-4 sm:mx-8 mt-3 flex items-start gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-800">
+            <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
+            <span className="flex-1">{syncError}</span>
+            <button onClick={() => setSyncError(null)} className="text-rose-500 hover:text-rose-700" aria-label="Cerrar aviso">✕</button>
+          </div>
+        )}
+        {!cloudLoaded && (
+          <div className="mx-4 sm:mx-8 mt-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-500">
+            Cargando datos de la nube…
+          </div>
+        )}
 
         {/* Scrollable View Body - with mobile bottom padding */}
         <div className="flex-1 overflow-y-auto p-3 sm:p-6 lg:p-8 pb-24 lg:pb-8">
@@ -652,12 +717,12 @@ export default function App() {
         <div className="border-b pb-4 mb-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <img 
-              src={germaniaLogo} 
-              alt="GER-MANIA Logo" 
+              src={BRAND.logo} 
+              alt={`${BRAND.name} Logo`} 
               className="w-12 h-12 rounded-lg object-cover border"
             />
             <div>
-              <h1 className="text-xl font-black uppercase tracking-tight">GER-MANIA - Trabajos en Madera</h1>
+              <h1 className="text-xl font-black uppercase tracking-tight">{BRAND.name} - {BRAND.tagline}</h1>
               <p className="text-xs text-gray-600">Período: {getMonthLabel(selectedMonth)}</p>
             </div>
           </div>

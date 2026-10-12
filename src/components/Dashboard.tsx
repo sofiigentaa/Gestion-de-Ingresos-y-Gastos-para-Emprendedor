@@ -301,11 +301,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
               <table className="w-full text-left border-collapse">
                 <thead className="bg-slate-50/70 sticky top-0 border-b border-slate-100">
                   <tr className="text-[11px] uppercase text-slate-500 font-bold tracking-wider">
-                    <th className="px-5 sm:px-6 py-3.5">Fecha</th>
-                    <th className="px-5 sm:px-6 py-3.5">Concepto / Detalle</th>
-                    <th className="px-5 sm:px-6 py-3.5">Categoría</th>
-                    <th className="px-5 sm:px-6 py-3.5 text-right">Monto</th>
-                    <th className="px-4 py-3.5 text-center">Acciones</th>
+                    <th className="px-3 2xl:px-6 py-3.5">Fecha</th>
+                    <th className="px-3 2xl:px-6 py-3.5">Concepto / Detalle</th>
+                    <th className="px-3 2xl:px-6 py-3.5">Categoría</th>
+                    <th className="px-3 2xl:px-6 py-3.5 text-right">Monto</th>
+                    <th className="px-2 2xl:px-2 2xl:px-4 py-3.5 text-center">Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-sm">
@@ -320,27 +320,27 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   ) : (
                     recentTransactions.map((tx) => (
                       <tr key={tx.id} className="text-slate-700 hover:bg-slate-50/70 transition-colors">
-                        <td className="px-5 sm:px-6 py-4 font-mono text-xs text-slate-500 whitespace-nowrap">
+                        <td className="px-3 2xl:px-6 py-4 font-mono text-xs text-slate-500 whitespace-nowrap">
                           {formatDateSpanish(tx.date)}
                         </td>
-                        <td className="px-5 sm:px-6 py-4">
+                        <td className="px-3 2xl:px-6 py-4">
                           <p className="font-semibold text-slate-900 leading-snug">{tx.description}</p>
                           {tx.subcategory && (
                             <p className="text-xs text-slate-500 mt-0.5">{tx.subcategory}</p>
                           )}
                         </td>
-                        <td className="px-5 sm:px-6 py-4 whitespace-nowrap">
+                        <td className="px-3 2xl:px-6 py-4 whitespace-nowrap">
                           <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold border ${getCategoryBadgeClass(tx.categoryId, tx.type)}`}>
                             <CategoryIcon name={categories.find(c => c.id === tx.categoryId)?.icon || 'CircleDot'} className="w-3.5 h-3.5" />
                             <span>{tx.categoryName}</span>
                           </span>
                         </td>
-                        <td className="px-5 sm:px-6 py-4 text-right font-bold whitespace-nowrap">
+                        <td className="px-3 2xl:px-6 py-4 text-right font-bold whitespace-nowrap">
                           <span className={tx.type === 'ingreso' ? 'text-emerald-600' : 'text-slate-900'}>
                             {tx.type === 'ingreso' ? '+' : '-'}{formatCurrency(tx.amount, currencySymbol)}
                           </span>
                         </td>
-                        <td className="px-4 py-4 text-center whitespace-nowrap">
+                        <td className="px-2 2xl:px-4 py-4 text-center whitespace-nowrap">
                           <div className="flex items-center justify-center space-x-1">
                             <button
                               onClick={() => onEditTransaction(tx)}
