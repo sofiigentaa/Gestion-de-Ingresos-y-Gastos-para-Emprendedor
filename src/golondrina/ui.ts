@@ -19,6 +19,12 @@ export interface OpcionesUI {
   contenedor: HTMLElement
   alEnviar: (texto: string) => void
   alAbrir: () => void
+  alMenu: () => void
+}
+
+export interface GrupoMenu {
+  nombre: string
+  items: (Boton & { apagado?: boolean; ayuda?: string })[]
 }
 
 const SILUETA = `
@@ -47,7 +53,16 @@ const ESTILOS = (o: OpcionesUI) => `
 .cabecera .silueta { width: 28px; height: 28px; }
 .cabecera strong { font-size: 15px; display: block; }
 .cabecera small { opacity: .85; font-size: 12px; }
-.cabecera button { margin-left: auto; background: transparent; border: none; color: inherit; font-size: 22px; cursor: pointer; line-height: 1; }
+.cabecera .acciones-cabecera { margin-left: auto; display: flex; align-items: center; gap: 4px; }
+.cabecera button { background: transparent; border: none; color: inherit; font-size: 22px; cursor: pointer; line-height: 1; }
+.cabecera .btn-menu { white-space: nowrap; font-size: 12px; font-weight: 600; border: 1px solid currentColor; border-radius: 999px; padding: 5px 10px; opacity: .9; }
+.cabecera .btn-menu:hover { opacity: 1; }
+.msg.menu { max-width: 100%; width: 100%; }
+.menu .grupo { margin-top: 10px; }
+.menu .grupo:first-of-type { margin-top: 8px; }
+.menu .titulo-grupo { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--g-color); margin-bottom: 4px; }
+.menu .botones { margin-top: 0; }
+.menu .botones button.apagado { opacity: .45; border-style: dashed; }
 .mensajes { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; background: var(--g-suave); }
 .msg { max-width: 86%; padding: 9px 12px; border-radius: 14px; font-size: 14px; line-height: 1.4; white-space: pre-line; word-wrap: break-word; }
 .msg.golondrina { background: var(--g-fondo); align-self: flex-start; border-bottom-left-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
@@ -109,7 +124,8 @@ export class InterfazGolondrina {
         </section>
         <section class="panel" role="dialog" aria-label="Asistente ${escapar(opciones.nombre)}">
           <header class="cabecera">${SILUETA}<div><strong>${escapar(opciones.nombre)}</strong><small>Tu asistente · aprende de lo que hacés</small></div>
-            <button class="cerrar-panel" aria-label="Cerrar asistente">×</button></header>
+            <div class="acciones-cabecera"><button class="btn-menu" type="button" title="Ver todas las funciones">☰ Funciones</button>
+            <button class="cerrar-panel" aria-label="Cerrar asistente">×</button></div></header>
           <div class="mensajes" aria-live="polite"></div>
           <div class="chips"></div>
           <form><input type="text" placeholder="Pedime lo que necesites..." aria-label="Mensaje para ${escapar(opciones.nombre)}" maxlength="300"/>
@@ -126,6 +142,7 @@ export class InterfazGolondrina {
 
     this.lanzador.addEventListener('click', () => this.alternar())
     this.raiz.querySelector('.cerrar-panel')!.addEventListener('click', () => this.cerrar())
+    this.raiz.querySelector('.btn-menu')!.addEventListener('click', () => this.opciones.alMenu())
     this.raiz.querySelector('form')!.addEventListener('submit', (e) => {
       e.preventDefault()
       const texto = this.entrada.value.trim()
@@ -191,6 +208,42 @@ export class InterfazGolondrina {
     this.mensajes.appendChild(div)
     this.mensajes.scrollTop = this.mensajes.scrollHeight
     if (!this.abierto && de === 'golondrina') this.lanzador.classList.add('aviso')
+  }
+
+  /** Menú con todas las funciones, agrupadas; cada una se usa con un toque. */
+  agregarMenu(intro: string, grupos: GrupoMenu[]) {
+    const div = document.createElement('div')
+    div.className = 'msg golondrina menu'
+    div.textContent = intro
+    for (const g of grupos) {
+      const sec = document.createElement('div')
+      sec.className = 'grupo'
+      const t = document.createElement('span')
+      t.className = 'titulo-grupo'
+      t.textContent = g.nombre
+      const cont = document.createElement('div')
+      cont.className = 'botones'
+      for (const item of g.items) {
+        const b = document.createElement('button')
+        b.type = 'button'
+        b.textContent = item.texto
+        if (item.apagado) b.classList.add('apagado')
+        if (item.ayuda) b.title = item.ayuda
+        b.addEventListener('click', item.alHacer)
+        cont.appendChild(b)
+      }
+      sec.append(t, cont)
+      div.appendChild(sec)
+    }
+    this.mensajes.appendChild(div)
+    div.scrollIntoView({ block: 'start' })
+  }
+
+  /** Deja una frase escrita en el campo para que el usuario la complete. */
+  escribir(texto: string) {
+    this.entrada.value = texto
+    this.entrada.focus()
+    this.entrada.setSelectionRange(texto.length, texto.length)
   }
 
   mostrarChips(chips: Boton[]) {

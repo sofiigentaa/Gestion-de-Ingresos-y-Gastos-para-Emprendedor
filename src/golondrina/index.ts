@@ -25,7 +25,7 @@ import {
 import { Memoria } from './memoria'
 import { buscarOpcion, normalizar } from './texto'
 import type { Accion, Contexto, OpcionesGolondrina, ParametroAccion, Parametros, Sugerencia, ValorContexto, Via } from './tipos'
-import { InterfazGolondrina, type Boton } from './ui'
+import { InterfazGolondrina, type Boton, type GrupoMenu } from './ui'
 
 export type * from './tipos'
 
@@ -75,6 +75,7 @@ export class Golondrina {
       contenedor: this.op.contenedor ?? document.body,
       alEnviar: (texto) => void this.escuchar(texto),
       alAbrir: () => this.alAbrirPanel(),
+      alMenu: () => this.mostrarMenu(),
     })
     this.ui.definirTema(this.temaActual)
     if (this.op.capturarClics !== false) document.addEventListener('click', this.alClic, true)
@@ -195,7 +196,13 @@ export class Golondrina {
       if (valor) return this.completar(pendiente.accion, { ...pendiente.parametros, [pendiente.faltante.nombre]: valor }, pendiente.frase)
     }
 
-    if (esPedidoDeAyuda(texto)) return this.ayuda()
+    if (esPedidoDeAyuda(texto)) {
+      if (this.ui) {
+        this.mostrarMenu()
+        return null
+      }
+      return this.ayuda()
+    }
     if (esPreguntaAprendizaje(texto)) {
       return { texto: resumenAprendido(this.memoria, this.acciones, this.ahora(), this.op.minRepeticiones) }
     }
@@ -297,6 +304,62 @@ export class Golondrina {
     }
   }
 
+  /** Etiqueta para el menú: la propia, o el título sin parámetros vacíos. */
+  private etiqueta(a: Accion) {
+    return a.menu ?? tituloDe(a, {}).replace(/«\s*»/g, '').replace(/\s+/g, ' ').trim()
+  }
+
+  /** Todas las funciones del sistema, agrupadas, para usarlas con un toque. */
+  grupos(): GrupoMenu[] {
+    const porGrupo = new Map<string, GrupoMenu['items']>()
+    for (const a of this.acciones.values()) {
+      const nombre = a.grupo ?? 'Funciones'
+      const items = porGrupo.get(nombre) ?? []
+      const etiqueta = this.etiqueta(a)
+      const disponible = accionAplica(a, this.ctx)
+      const escribir = (a.alTocar ?? (a.parametros?.some((p) => p.requerido) ? 'escribir' : 'ejecutar')) === 'escribir'
+      items.push({
+        texto: etiqueta,
+        apagado: !disponible,
+        ayuda: disponible ? (a.descripcion ?? etiqueta) : (a.requisito ?? 'No disponible en esta pantalla'),
+        alHacer: () => {
+          if (!disponible) {
+            this.ui?.agregarMensaje('golondrina', `${etiqueta}: ${a.requisito ?? 'eso no se puede desde esta pantalla.'}`)
+            return
+          }
+          if (escribir) {
+            const ejemplo = ejemploFrase(a, {})
+            this.ui?.agregarMensaje('golondrina', `Te dejé un ejemplo escrito: cambialo por lo que necesites y enviá.`)
+            this.ui?.escribir(ejemplo.replace(/…/g, '').trimEnd())
+            return
+          }
+          this.ui?.agregarMensaje('usuario', etiqueta)
+          void this.ejecutar(a.id, {}, 'asistente').then((r) => {
+            this.ui?.agregarMensaje('golondrina', r)
+            this.actualizarChips()
+          })
+        },
+      })
+      porGrupo.set(nombre, items)
+    }
+    const grupos = [...porGrupo.entries()].map(([nombre, items]) => ({ nombre, items }))
+    grupos.push({
+      nombre: this.op.nombre,
+      items: [
+        { texto: '¿Qué aprendiste de mí?', alHacer: () => void this.escuchar('¿qué aprendiste?') },
+        this.memoria.estado.silencio
+          ? { texto: 'Volver a sugerirme cosas', alHacer: () => void this.escuchar('volvé a sugerir') }
+          : { texto: 'No me sugieras', alHacer: () => void this.escuchar('no me sugieras') },
+        { texto: 'Olvidá lo aprendido', alHacer: () => void this.escuchar('olvidá todo') },
+      ],
+    })
+    return grupos
+  }
+
+  mostrarMenu() {
+    this.ui?.agregarMenu('Esto es todo lo que puedo hacer. Tocá una función o escribime con tus palabras:', this.grupos())
+  }
+
   // ───────────────────────── Automatización ─────────────────────────
 
   private alAbrirPanel() {
@@ -304,6 +367,7 @@ export class Golondrina {
       this.saludado = true
       const saludo = this.op.saludo ?? `¡Hola! Soy ${this.op.nombre}. Decime qué necesitás y lo hago. Con el uso aprendo tus costumbres para adelantarme.`
       this.ui?.agregarMensaje('golondrina', saludo)
+      this.mostrarMenu()
     }
     this.actualizarChips()
   }

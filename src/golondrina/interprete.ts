@@ -169,7 +169,7 @@ export function interpretar(
 
 export function esPedidoDeAyuda(texto: string): boolean {
   const n = normalizar(texto)
-  return /^(ayuda|help|\?|menu)$/.test(n) || /que (podes|puedes|sabes) hacer|como (funciona|te uso|se usa)|en que (me )?(podes|puedes) ayudar/.test(n)
+  return /^(ayuda|help|\?|menu|funciones|opciones|todas las funciones)$/.test(n) || /(ver|mostrar|mostrame) (todas )?(las )?funciones/.test(n) || /que (podes|puedes|sabes) hacer|como (funciona|te uso|se usa)|en que (me )?(podes|puedes) ayudar/.test(n)
 }
 
 export function esPreguntaAprendizaje(texto: string): boolean {

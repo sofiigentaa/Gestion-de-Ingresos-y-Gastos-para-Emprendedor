@@ -126,6 +126,9 @@ export function accionesDeFinanzas(e: EstadoFinanzas): Accion[] {
     // ───────── Registrar movimientos ─────────
     {
       id: 'registrar-egreso',
+      ejemplo: 'gasté 15 mil en madera en efectivo',
+      grupo: 'Registrar',
+      menu: 'Nuevo gasto',
       titulo: 'Registrar gasto {rubro}',
       descripcion: 'registrar un gasto diciéndomelo, por ejemplo «gasté 15 mil en madera»',
       frases: ['gasté {detalle}', 'pagué {detalle}', 'compré {detalle}', 'cargué {detalle}', 'registrar gasto {detalle}', 'nuevo egreso {detalle}', 'anotá un gasto {detalle}'],
@@ -139,6 +142,9 @@ export function accionesDeFinanzas(e: EstadoFinanzas): Accion[] {
     },
     {
       id: 'registrar-ingreso',
+      ejemplo: 'vendí 32.500 en la feria',
+      grupo: 'Registrar',
+      menu: 'Nuevo ingreso',
       titulo: 'Registrar ingreso {rubro}',
       descripcion: 'registrar una venta diciéndomela, por ejemplo «vendí 32.500 en la feria»',
       frases: ['vendí {detalle}', 'cobré {detalle}', 'me pagaron {detalle}', 'registrar ingreso {detalle}', 'nueva venta {detalle}', 'entró {detalle}'],
@@ -151,6 +157,8 @@ export function accionesDeFinanzas(e: EstadoFinanzas): Accion[] {
     },
     {
       id: 'corregir-ultimo',
+      grupo: 'Registrar',
+      menu: 'Corregir el último',
       titulo: 'Corregir el último movimiento',
       frases: ['corregir el último', 'editar el último movimiento', 'me equivoqué', 'modificar el último'],
       disponible: () => transactions.length > 0,
@@ -163,6 +171,8 @@ export function accionesDeFinanzas(e: EstadoFinanzas): Accion[] {
     },
     {
       id: 'borrar-ultimo',
+      grupo: 'Registrar',
+      menu: 'Borrar el último',
       titulo: 'Borrar el último movimiento',
       frases: ['borrar el último', 'eliminar el último movimiento', 'deshacer'],
       disponible: () => transactions.length > 0,
@@ -177,6 +187,9 @@ export function accionesDeFinanzas(e: EstadoFinanzas): Accion[] {
     // ───────── Consultas: ganancia y totales ─────────
     {
       id: 'ganancia',
+      ejemplo: 'cuánto gané este mes',
+      grupo: 'Consultar',
+      menu: 'Ganancia del mes',
       titulo: '¿Cuánto gané este mes?',
       descripcion: 'preguntarme cuánto ganaste, con lo que entró y lo que salió',
       frases: ['cuánto gané', 'ganancia del mes', 'cómo vengo este mes', 'balance del mes', 'resumen del mes', 'cuánto gané {detalle}'],
@@ -195,6 +208,10 @@ export function accionesDeFinanzas(e: EstadoFinanzas): Accion[] {
     },
     {
       id: 'cuanto-gaste',
+      ejemplo: 'cuánto gasté en nafta este mes',
+      grupo: 'Consultar',
+      menu: 'Cuánto gasté en…',
+      alTocar: 'escribir',
       titulo: '¿Cuánto gasté en un rubro?',
       descripcion: 'preguntarme cuánto gastaste en nafta, madera, láser…',
       frases: ['cuánto gasté {detalle}', 'cuánto llevo gastado {detalle}', 'total de gastos {detalle}'],
@@ -216,6 +233,9 @@ export function accionesDeFinanzas(e: EstadoFinanzas): Accion[] {
     },
     {
       id: 'cuanto-vendi',
+      ejemplo: 'cuánto vendí en ferias',
+      grupo: 'Consultar',
+      menu: 'Cuánto vendí',
       titulo: '¿Cuánto vendí?',
       descripcion: 'preguntarme cuánto vendiste en ferias o por encargo',
       frases: ['cuánto vendí {detalle}', 'cuánto entró {detalle}', 'total de ventas {detalle}', 'cuánto cobré {detalle}'],
@@ -231,6 +251,8 @@ export function accionesDeFinanzas(e: EstadoFinanzas): Accion[] {
     },
     {
       id: 'mayor-gasto',
+      grupo: 'Consultar',
+      menu: 'En qué gasto más',
       titulo: '¿En qué gasto más?',
       descripcion: 'preguntarme en qué se te va más la plata',
       frases: ['en qué gasto más', 'mayor gasto', 'dónde se va la plata', 'gastos más grandes'],
@@ -251,6 +273,8 @@ export function accionesDeFinanzas(e: EstadoFinanzas): Accion[] {
     // ───────── Navegar ─────────
     {
       id: 'ver-panel',
+      grupo: 'Ver',
+      menu: 'Panel general',
       titulo: 'Ver el panel general',
       frases: ['ver el panel', 'ir al dashboard', 'vista general', 'ver gráficos', 'ver totales'],
       ejecutar: () => {
@@ -260,6 +284,8 @@ export function accionesDeFinanzas(e: EstadoFinanzas): Accion[] {
     },
     {
       id: 'ver-dia',
+      grupo: 'Ver',
+      menu: 'Registro de hoy',
       titulo: 'Ver el registro del día',
       frases: ['ver el día', 'registro diario', 'movimientos de hoy', 'qué hice hoy', 'ver ayer'],
       parametros: [{ nombre: 'detalle', libre: true, completo: true, memorizable: false }],
@@ -277,6 +303,8 @@ export function accionesDeFinanzas(e: EstadoFinanzas): Accion[] {
     },
     {
       id: 'ver-insumos',
+      grupo: 'Ver',
+      menu: 'Insumos y rubros',
       titulo: 'Ver insumos y rubros',
       frases: ['ver insumos', 'ver categorías', 'desglose de gastos', 'ver rubros'],
       ejecutar: () => {
@@ -286,6 +314,8 @@ export function accionesDeFinanzas(e: EstadoFinanzas): Accion[] {
     },
     {
       id: 'ver-historial',
+      grupo: 'Ver',
+      menu: 'Todos los movimientos',
       titulo: 'Ver todos los movimientos',
       frases: ['ver historial', 'todos los movimientos', 'ver movimientos', 'lista de movimientos'],
       ejecutar: () => {
@@ -296,6 +326,10 @@ export function accionesDeFinanzas(e: EstadoFinanzas): Accion[] {
     },
     {
       id: 'ir-mes',
+      ejemplo: 'ir a octubre',
+      grupo: 'Ver',
+      menu: 'Ir a otro mes…',
+      alTocar: 'escribir',
       titulo: 'Ver {mes}',
       frases: ['ir a {mes}', 'ver {mes}', 'mostrar {mes}', 'cambiar a {mes}'],
       parametros: [{ nombre: 'mes', opciones: () => MESES, requerido: true, pregunta: '¿Qué mes?' }],
@@ -307,6 +341,8 @@ export function accionesDeFinanzas(e: EstadoFinanzas): Accion[] {
     },
     {
       id: 'mes-anterior',
+      grupo: 'Ver',
+      menu: 'Mes anterior',
       titulo: 'Ver el mes anterior',
       frases: ['mes anterior', 'mes pasado', 'ir al mes pasado'],
       ejecutar: () => {
@@ -317,6 +353,8 @@ export function accionesDeFinanzas(e: EstadoFinanzas): Accion[] {
     },
     {
       id: 'mes-siguiente',
+      grupo: 'Ver',
+      menu: 'Mes siguiente',
       titulo: 'Ver el mes siguiente',
       frases: ['mes siguiente', 'próximo mes'],
       ejecutar: () => {
@@ -329,6 +367,10 @@ export function accionesDeFinanzas(e: EstadoFinanzas): Accion[] {
     // ───────── Filtrar ─────────
     {
       id: 'filtrar',
+      ejemplo: 'mostrar gastos de madera de octubre',
+      grupo: 'Filtrar y buscar',
+      menu: 'Filtrar o buscar…',
+      alTocar: 'escribir',
       titulo: 'Filtrar movimientos {rubro}',
       descripcion: 'pedirme movimientos filtrados, por ejemplo «gastos de nafta de octubre»',
       frases: ['filtrar {detalle}', 'mostrar gastos de {detalle}', 'mostrar ingresos de {detalle}', 'ver gastos de {detalle}', 'ver ventas de {detalle}', 'buscar {detalle}'],
@@ -365,6 +407,9 @@ export function accionesDeFinanzas(e: EstadoFinanzas): Accion[] {
     // ───────── Exportar ─────────
     {
       id: 'exportar-excel',
+      ejemplo: 'exportar a excel',
+      grupo: 'Exportar',
+      menu: 'Exportar todo a Excel',
       titulo: 'Exportar a Excel',
       descripcion: 'descargar los movimientos en Excel (CSV) con una frase',
       frases: ['exportar a excel', 'descargar movimientos', 'exportar csv', 'bajar planilla', 'exportar {detalle}'],
@@ -381,6 +426,8 @@ export function accionesDeFinanzas(e: EstadoFinanzas): Accion[] {
     },
     {
       id: 'respaldo',
+      grupo: 'Exportar',
+      menu: 'Copia de seguridad',
       titulo: 'Descargar copia de seguridad',
       frases: ['hacer copia de seguridad', 'descargar respaldo', 'backup', 'guardar respaldo'],
       ejecutar: () => {
@@ -390,6 +437,8 @@ export function accionesDeFinanzas(e: EstadoFinanzas): Accion[] {
     },
     {
       id: 'imprimir',
+      grupo: 'Exportar',
+      menu: 'Imprimir reporte / PDF',
       titulo: 'Imprimir el reporte del mes',
       frases: ['imprimir reporte', 'reporte en pdf', 'imprimir el mes', 'sacar reporte'],
       ejecutar: () => {
@@ -399,11 +448,52 @@ export function accionesDeFinanzas(e: EstadoFinanzas): Accion[] {
     },
     {
       id: 'abrir-exportar',
+      grupo: 'Exportar',
+      menu: 'Restaurar respaldo y más',
       titulo: 'Abrir exportar y respaldos',
       frases: ['abrir exportar', 'opciones de exportación', 'restaurar respaldo'],
       ejecutar: () => {
         e.abrirExportar();
         return 'Abrí la ventana de exportar y respaldos.';
+      },
+    },
+    // ───────── Atajos de filtro y exportación (para el menú) ─────────
+    {
+      id: 'ver-gastos',
+      grupo: 'Filtrar y buscar',
+      menu: 'Solo gastos del mes',
+      titulo: 'Ver solo los gastos del mes',
+      frases: ['ver solo gastos', 'solo egresos', 'gastos del mes'],
+      ejecutar: () => {
+        const [a, m] = selectedMonth.split('-').map(Number);
+        e.filtrarHistorial({ request: Date.now(), search: '', type: 'egreso', categoryId: 'all', startDate: `${selectedMonth}-01`, endDate: `${selectedMonth}-${String(new Date(a, m, 0).getDate()).padStart(2, '0')}` });
+        e.setCurrentView('history');
+        return `Gastos de ${getMonthLabel(selectedMonth)}.`;
+      },
+    },
+    {
+      id: 'ver-ingresos',
+      grupo: 'Filtrar y buscar',
+      menu: 'Solo ingresos del mes',
+      titulo: 'Ver solo los ingresos del mes',
+      frases: ['ver solo ingresos', 'solo ventas', 'ingresos del mes'],
+      ejecutar: () => {
+        const [a, m] = selectedMonth.split('-').map(Number);
+        e.filtrarHistorial({ request: Date.now(), search: '', type: 'ingreso', categoryId: 'all', startDate: `${selectedMonth}-01`, endDate: `${selectedMonth}-${String(new Date(a, m, 0).getDate()).padStart(2, '0')}` });
+        e.setCurrentView('history');
+        return `Ingresos de ${getMonthLabel(selectedMonth)}.`;
+      },
+    },
+    {
+      id: 'exportar-mes',
+      grupo: 'Exportar',
+      menu: 'Exportar el mes a Excel',
+      titulo: 'Exportar el mes a Excel',
+      frases: ['exportar el mes', 'excel del mes', 'descargar el mes'],
+      ejecutar: () => {
+        const lista = transactions.filter((t) => t.date.startsWith(selectedMonth));
+        exportTransactionsToCSV(lista);
+        return `Descargué ${lista.length} movimientos de ${getMonthLabel(selectedMonth)} en un archivo que abre Excel.`;
       },
     },
   ];

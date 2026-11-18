@@ -78,6 +78,10 @@ El intérprete local cubre las frases de las acciones. Si se quiere entender len
 - `TransactionsTable` acepta `filtroExterno` (el asistente aplica filtros pedidos con palabras).
 - Se registra lo que se hace a mano: cada movimiento guardado (por el rubro, no el monto), navegación, cambio de mes, filtros por categoría, exportaciones.
 
+### Menú de funciones
+
+Al abrir el asistente aparece el **menú con todas las funciones del sistema**, agrupadas (Registrar · Consultar · Ver · Filtrar y buscar · Exportar · Golondrina). Se vuelve a ver con el botón **☰ Funciones** o escribiendo «funciones» / «ayuda». Cada botón se usa con un toque: lo que no necesita datos se hace al instante («Ganancia del mes», «Exportar el mes a Excel»); lo que necesita datos deja escrito un ejemplo para completar («cuánto gasté en nafta este mes»). Para que una acción nueva aparezca en el menú alcanza con darle `grupo` y `menu`.
+
 ### Un asistente para cada función
 
 | Función | Pedido de ejemplo | Qué hace |

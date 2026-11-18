@@ -59,6 +59,18 @@ export interface Accion {
   /** Qué le falta al usuario cuando no está disponible (ej: "Primero ingresá a gestión"). */
   requisito?: string
   ejecutar: (parametros: Parametros, ctx: Contexto) => ResultadoAccion
+  /** Frase de ejemplo concreta para enseñar la acción ("cuánto gasté en nafta"). */
+  ejemplo?: string
+  /** Grupo en el menú de funciones del asistente (ej: "Registrar", "Consultar"). */
+  grupo?: string
+  /** Texto del botón en el menú (por defecto, el título sin parámetros). */
+  menu?: string
+  /**
+   * Qué pasa al tocarla en el menú: 'ejecutar' la hace al instante; 'escribir'
+   * deja la frase de ejemplo lista para completar. Por defecto: 'escribir' si
+   * tiene parámetros obligatorios, si no 'ejecutar'.
+   */
+  alTocar?: 'ejecutar' | 'escribir'
   /** Golondrina puede presentarla al usuario aunque nunca la haya usado. */
   descubrible?: boolean
   /** Cómo hacerlo a mano (se muestra al enseñar la acción). */

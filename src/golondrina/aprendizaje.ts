@@ -218,6 +218,7 @@ export function generarSugerencias({ memoria, acciones, ctx, ahora, minRepeticio
 }
 
 export function ejemploFrase(accion: Accion, parametros: Parametros): string {
+  if (accion.ejemplo && Object.keys(parametros).length === 0) return accion.ejemplo
   const frase = accion.frases?.[0] ?? accion.titulo
   return frase.replace(/\{(\w+)\}/g, (_, nombre: string) => {
     if (parametros[nombre]) return parametros[nombre]
