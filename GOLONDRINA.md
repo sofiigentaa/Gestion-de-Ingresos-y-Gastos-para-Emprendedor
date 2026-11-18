@@ -1,4 +1,4 @@
-# Golondrina — asistente que aprende de cada usuario
+# Golondrina - asistente que aprende de cada usuario
 
 Golondrina tiene dos partes que trabajan juntas:
 
