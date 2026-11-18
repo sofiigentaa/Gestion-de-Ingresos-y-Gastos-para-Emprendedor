@@ -12,6 +12,9 @@ interface TransactionModalProps {
   categories: CategoryOption[];
   defaultDate?: string;
   defaultType?: TransactionType;
+  /** Rubro ya elegido (lo usa el asistente Golondrina). */
+  defaultCategoryId?: string;
+  defaultSubcategory?: string;
   currencySymbol: string;
 }
 
@@ -23,6 +26,8 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
   categories,
   defaultDate,
   defaultType = 'egreso',
+  defaultCategoryId,
+  defaultSubcategory,
   currencySymbol,
 }) => {
   const [type, setType] = useState<TransactionType>(defaultType);
@@ -56,9 +61,13 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
       setReceiptNumber('');
       setCustomSubcategory('');
 
-      // Pick first matching category
+      // Rubro pedido (asistente) o, si no, la primera categoría del tipo
       const matchingCats = categories.filter((c) => c.type === defaultType);
-      if (matchingCats.length > 0) {
+      const pedida = matchingCats.find((c) => c.id === defaultCategoryId);
+      if (pedida) {
+        setCategoryId(pedida.id);
+        setSubcategory(defaultSubcategory && pedida.subcategories.includes(defaultSubcategory) ? defaultSubcategory : pedida.subcategories[0] || '');
+      } else if (matchingCats.length > 0) {
         setCategoryId(matchingCats[0].id);
         setSubcategory(matchingCats[0].subcategories[0] || '');
       } else {
@@ -66,7 +75,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
         setSubcategory('');
       }
     }
-  }, [editingTransaction, isOpen, defaultDate, defaultType, categories]);
+  }, [editingTransaction, isOpen, defaultDate, defaultType, defaultCategoryId, defaultSubcategory, categories]);
 
   // When type changes, adjust available categories
   const handleTypeChange = (newType: TransactionType) => {
