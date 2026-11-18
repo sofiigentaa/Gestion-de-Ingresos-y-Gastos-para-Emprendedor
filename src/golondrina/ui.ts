@@ -27,10 +27,13 @@ export interface GrupoMenu {
   items: (Boton & { apagado?: boolean; ayuda?: string })[]
 }
 
+// La "G" de Golondrina (escudo con la G), la misma marca que en los demás sistemas de tecnoros.ar.
 const SILUETA = `
-<svg viewBox="0 0 64 64" aria-hidden="true" class="silueta">
-  <path d="M6 30c8-1 15 1 21 5 2-7 7-13 15-16 6-2 12-1 16 2-4 0-7 1-9 3l7 1-8 3c-2 7-7 13-15 16l-9 12-1-11c-5-1-9-4-12-8l-11 9 6-13c-1-1-1-2 0-3z" fill="currentColor"/>
-  <circle cx="47" cy="22" r="1.6" fill="var(--g-fondo)"/>
+<svg viewBox="0 0 100 115" aria-hidden="true" class="silueta">
+  <path d="M50 6L89 19C89 62 80 92 50 110C20 92 11 62 11 19Z" fill="#0B1220" stroke="#34D399" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M66 40H42L32 50V70L42 80H58L66 72V62H52" fill="none" stroke="#F1F5F9" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="66" cy="40" r="6" fill="#34D399"/>
+  <circle cx="52" cy="62" r="6" fill="#34D399"/>
 </svg>`
 
 const ESTILOS = (o: OpcionesUI) => `
