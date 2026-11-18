@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { asistente, FiltroHistorial } from '../asistente';
 import { Transaction, CategoryOption, TransactionType } from '../types';
 import { formatCurrency, formatDateSpanish } from '../utils/formatters';
 import { CategoryIcon } from './CategoryIcon';
@@ -20,6 +21,8 @@ interface TransactionsTableProps {
   onDeleteTransaction: (id: string) => void;
   onExportCSV: () => void;
   onOpenResetModal?: () => void;
+  /** Filtros pedidos al asistente Golondrina (cambia `request` en cada pedido). */
+  filtroExterno?: FiltroHistorial | null;
 }
 
 export const TransactionsTable: React.FC<TransactionsTableProps> = ({
@@ -31,6 +34,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
   onDeleteTransaction,
   onExportCSV,
   onOpenResetModal,
+  filtroExterno,
 }) => {
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<'all' | 'ingreso' | 'egreso'>('all');
@@ -39,6 +43,16 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
   const [sortBy, setSortBy] = useState<'date_desc' | 'date_asc' | 'amount_desc' | 'amount_asc'>('date_desc');
+
+  // Aplica los filtros que la usuaria le pidió al asistente.
+  useEffect(() => {
+    if (!filtroExterno) return;
+    if (filtroExterno.search !== undefined) setSearch(filtroExterno.search);
+    if (filtroExterno.type) setTypeFilter(filtroExterno.type);
+    if (filtroExterno.categoryId) setCategoryFilter(filtroExterno.categoryId);
+    if (filtroExterno.startDate !== undefined) setStartDate(filtroExterno.startDate);
+    if (filtroExterno.endDate !== undefined) setEndDate(filtroExterno.endDate);
+  }, [filtroExterno?.request]);
 
   // Filtered & Sorted Transactions
   const filteredTransactions = useMemo(() => {
@@ -205,7 +219,11 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
           <div>
             <select
               value={categoryFilter}
-              onChange={(e) => setCategoryFilter(e.target.value)}
+              onChange={(e) => {
+                const cat = categories.find((c) => c.id === e.target.value);
+                if (cat) asistente.registrar('filtrar', { rubro: cat.name });
+                setCategoryFilter(e.target.value);
+              }}
               className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-slate-50 text-slate-700 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400"
             >
               <option value="all">Todas las Categorías</option>

@@ -19,6 +19,7 @@ import {
   Result,
 } from './lib/supabase';
 import { BRAND } from './config/brand';
+import { asistente, accionesDeFinanzas, FiltroHistorial } from './asistente';
 import { 
   getCurrentMonthKey, 
   getTodayDateString, 
@@ -75,6 +76,19 @@ export default function App() {
   const [modalDefaultDate, setModalDefaultDate] = useState<string>(getTodayDateString());
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
+  // Asistente Golondrina: formulario con rubro elegido y filtros del historial pedidos por voz/texto
+  const [modalDefaultCategory, setModalDefaultCategory] = useState<{ id?: string; sub?: string } | null>(null);
+  const [filtroHistorial, setFiltroHistorial] = useState<FiltroHistorial | null>(null);
+
+  useEffect(() => {
+    asistente.montar();
+    return () => asistente.destruir();
+  }, []);
+
+  // Contexto para Golondrina: pantalla actual y mes que se está mirando.
+  useEffect(() => {
+    asistente.contexto(currentView, { mes: selectedMonth });
+  }, [currentView, selectedMonth]);
 
   // Modo local: se guarda en el navegador
   useEffect(() => {
@@ -138,6 +152,7 @@ export default function App() {
 
   const handleOpenAddTx = (type: 'egreso' | 'ingreso' = 'egreso', customDate?: string) => {
     setEditingTransaction(null);
+    setModalDefaultCategory(null);
     setModalDefaultType(type);
     setModalDefaultDate(customDate || selectedDate || getTodayDateString());
     setIsTxModalOpen(true);
@@ -145,6 +160,7 @@ export default function App() {
 
   const handleOpenAddTxWithCategory = (type: 'egreso' | 'ingreso' = 'egreso', categoryId?: string) => {
     setEditingTransaction(null);
+    setModalDefaultCategory(categoryId ? { id: categoryId } : null);
     setModalDefaultType(type);
     setModalDefaultDate(selectedDate || getTodayDateString());
     setIsTxModalOpen(true);
@@ -185,6 +201,10 @@ export default function App() {
       };
       setTransactions((prev) => [newTx, ...prev]);
       syncTransactionToSupabase(newTx).then(handleCloudResult);
+      // Golondrina aprende qué se registra (rubro), no el monto.
+      asistente.registrar(newTx.type === 'ingreso' ? 'registrar-ingreso' : 'registrar-egreso', {
+        rubro: newTx.subcategory || newTx.categoryName,
+      });
 
       const txMonth = txData.date.slice(0, 7);
       if (txMonth !== selectedMonth) {
@@ -227,6 +247,31 @@ export default function App() {
       setSelectedMonth(monthOfDate);
     }
   };
+
+  // En cada render el asistente recibe las acciones con el estado actual.
+  asistente.definirAcciones(
+    accionesDeFinanzas({
+      transactions,
+      categories,
+      selectedMonth,
+      currentView,
+      setCurrentView,
+      setSelectedMonth,
+      setSelectedDate,
+      guardar: (tx) => handleSaveTx(tx),
+      abrirFormulario: (tipo, categoryId, sub) => {
+        setEditingTransaction(null);
+        setModalDefaultType(tipo);
+        setModalDefaultDate(getTodayDateString());
+        setModalDefaultCategory({ id: categoryId, sub });
+        setIsTxModalOpen(true);
+      },
+      editar: handleEditTx,
+      borrar: handleDeleteTx,
+      abrirExportar: () => setIsExportOpen(true),
+      filtrarHistorial: setFiltroHistorial,
+    })
+  );
 
   // Month stats for sidebar
   const monthTransactions = transactions.filter((t) => t.date.startsWith(selectedMonth));
@@ -313,6 +358,7 @@ export default function App() {
               setIsMobileMenuOpen(false);
             }}
             id="nav-dashboard"
+            data-golondrina="ver-panel"
             className={`w-full flex items-center space-x-3 p-3 rounded-xl transition-all text-left text-sm ${
               currentView === 'dashboard'
                 ? 'bg-indigo-600/20 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs'
@@ -334,6 +380,7 @@ export default function App() {
               setIsMobileMenuOpen(false);
             }}
             id="nav-daily"
+            data-golondrina="ver-dia"
             className={`w-full flex items-center space-x-3 p-3 rounded-xl transition-all text-left text-sm ${
               currentView === 'daily'
                 ? 'bg-indigo-600/20 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs'
@@ -355,6 +402,7 @@ export default function App() {
               setIsMobileMenuOpen(false);
             }}
             id="nav-categories"
+            data-golondrina="ver-insumos"
             className={`w-full flex items-center space-x-3 p-3 rounded-xl transition-all text-left text-sm ${
               currentView === 'categories'
                 ? 'bg-indigo-600/20 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs'
@@ -376,6 +424,7 @@ export default function App() {
               setIsMobileMenuOpen(false);
             }}
             id="nav-history"
+            data-golondrina="ver-historial"
             className={`w-full flex items-center space-x-3 p-3 rounded-xl transition-all text-left text-sm ${
               currentView === 'history'
                 ? 'bg-indigo-600/20 text-indigo-300 font-semibold border border-indigo-500/30 shadow-xs'
@@ -401,6 +450,7 @@ export default function App() {
               setIsMobileMenuOpen(false);
             }}
             id="nav-export"
+            data-golondrina="abrir-exportar"
             className="w-full flex items-center space-x-3 p-3 rounded-xl transition-all text-left text-sm text-slate-400 hover:text-white hover:bg-slate-800/60"
           >
             <span className="w-2 h-2 rounded-full bg-slate-600" />
@@ -503,6 +553,7 @@ export default function App() {
               <button
                 onClick={handlePrevMonth}
                 id="btn-header-prev-month"
+            data-golondrina="mes-anterior"
                 title="Mes anterior"
                 className="p-1.5 text-slate-600 hover:text-slate-900 hover:bg-white rounded-full transition-all"
               >
@@ -514,6 +565,7 @@ export default function App() {
               <button
                 onClick={handleNextMonth}
                 id="btn-header-next-month"
+            data-golondrina="mes-siguiente"
                 title="Mes siguiente"
                 className="p-1.5 text-slate-600 hover:text-slate-900 hover:bg-white rounded-full transition-all"
               >
@@ -610,7 +662,11 @@ export default function App() {
                 onOpenTransactionModal={handleOpenAddTx}
                 onEditTransaction={handleEditTx}
                 onDeleteTransaction={handleDeleteTx}
-                onExportCSV={() => exportTransactionsToCSV(transactions)}
+                onExportCSV={() => {
+                  asistente.registrar('exportar-excel');
+                  exportTransactionsToCSV(transactions);
+                }}
+                filtroExterno={filtroHistorial}
                 onOpenResetModal={() => setIsResetModalOpen(true)}
               />
             )}
@@ -625,6 +681,7 @@ export default function App() {
           <button
             onClick={() => setCurrentView('dashboard')}
             id="mobile-nav-dashboard"
+            data-golondrina="ver-panel"
             className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-xl transition-all ${
               currentView === 'dashboard' ? 'text-indigo-400 font-bold bg-slate-800/70' : 'hover:text-white'
             }`}
@@ -636,6 +693,7 @@ export default function App() {
           <button
             onClick={() => setCurrentView('daily')}
             id="mobile-nav-daily"
+            data-golondrina="ver-dia"
             className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-xl transition-all ${
               currentView === 'daily' ? 'text-indigo-400 font-bold bg-slate-800/70' : 'hover:text-white'
             }`}
@@ -655,6 +713,7 @@ export default function App() {
           <button
             onClick={() => setCurrentView('categories')}
             id="mobile-nav-categories"
+            data-golondrina="ver-insumos"
             className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-xl transition-all ${
               currentView === 'categories' ? 'text-indigo-400 font-bold bg-slate-800/70' : 'hover:text-white'
             }`}
@@ -666,6 +725,7 @@ export default function App() {
           <button
             onClick={() => setCurrentView('history')}
             id="mobile-nav-history"
+            data-golondrina="ver-historial"
             className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-xl transition-all ${
               currentView === 'history' ? 'text-indigo-400 font-bold bg-slate-800/70' : 'hover:text-white'
             }`}
@@ -685,6 +745,8 @@ export default function App() {
         categories={categories}
         defaultDate={modalDefaultDate}
         defaultType={modalDefaultType}
+        defaultCategoryId={modalDefaultCategory?.id}
+        defaultSubcategory={modalDefaultCategory?.sub}
         currencySymbol={currencySymbol}
       />
 
