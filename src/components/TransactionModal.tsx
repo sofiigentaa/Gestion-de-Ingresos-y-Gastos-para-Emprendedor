@@ -146,6 +146,9 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs overflow-y-auto">
       <div 
         id="transaction-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-label={editingTransaction ? 'Editar Movimiento' : 'Registrar Nuevo Movimiento'}
         className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden my-6 max-h-[90vh] flex flex-col"
       >
         {/* Modal Header */}
