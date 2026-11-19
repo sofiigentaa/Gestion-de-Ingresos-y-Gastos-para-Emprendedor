@@ -39,7 +39,7 @@ export interface EstadoFinanzas {
   setSelectedMonth: (m: string) => void;
   setSelectedDate: (d: string) => void;
   guardar: (tx: Omit<Transaction, 'id' | 'createdAt'>) => void;
-  abrirFormulario: (tipo: TransactionType, categoryId?: string, subcategoria?: string) => void;
+  abrirFormulario: (tipo: TransactionType, categoryId?: string, subcategoria?: string, monto?: number) => void;
   editar: (tx: Transaction) => void;
   borrar: (id: string) => void;
   abrirExportar: () => void;
@@ -102,7 +102,7 @@ export function accionesDeFinanzas(e: EstadoFinanzas): Accion[] {
     const nombre = tipo === 'ingreso' ? 'ingreso' : 'gasto';
 
     if (!mov.monto || !categoria) {
-      e.abrirFormulario(tipo, categoria?.id, sub);
+      e.abrirFormulario(tipo, categoria?.id, sub, mov.monto ?? undefined);
       if (!categoria && mov.monto) return `Te abrí el formulario de ${nombre} por ${pesos(mov.monto)}: elegí el rubro y guardá.`;
       return categoria
         ? `Te abrí el formulario de ${nombre} con «${sub || categoria.name}» elegido. Completá el monto y guardá.`

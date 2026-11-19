@@ -77,7 +77,7 @@ export default function App() {
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
   // Asistente Golondrina: formulario con rubro elegido y filtros del historial pedidos por voz/texto
-  const [modalDefaultCategory, setModalDefaultCategory] = useState<{ id?: string; sub?: string } | null>(null);
+  const [modalDefaultCategory, setModalDefaultCategory] = useState<{ id?: string; sub?: string; amount?: string } | null>(null);
   const [filtroHistorial, setFiltroHistorial] = useState<FiltroHistorial | null>(null);
 
   useEffect(() => {
@@ -259,11 +259,11 @@ export default function App() {
       setSelectedMonth,
       setSelectedDate,
       guardar: (tx) => handleSaveTx(tx),
-      abrirFormulario: (tipo, categoryId, sub) => {
+      abrirFormulario: (tipo, categoryId, sub, monto) => {
         setEditingTransaction(null);
         setModalDefaultType(tipo);
         setModalDefaultDate(getTodayDateString());
-        setModalDefaultCategory({ id: categoryId, sub });
+        setModalDefaultCategory({ id: categoryId, sub, amount: monto === undefined ? undefined : String(monto) });
         setIsTxModalOpen(true);
       },
       editar: handleEditTx,
@@ -747,6 +747,7 @@ export default function App() {
         defaultType={modalDefaultType}
         defaultCategoryId={modalDefaultCategory?.id}
         defaultSubcategory={modalDefaultCategory?.sub}
+        defaultAmount={modalDefaultCategory?.amount}
         currencySymbol={currencySymbol}
       />
 

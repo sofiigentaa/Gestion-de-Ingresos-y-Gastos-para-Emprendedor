@@ -15,6 +15,8 @@ interface TransactionModalProps {
   /** Rubro ya elegido (lo usa el asistente Golondrina). */
   defaultCategoryId?: string;
   defaultSubcategory?: string;
+  /** Monto ya dicho (lo usa el asistente Golondrina). */
+  defaultAmount?: string;
   currencySymbol: string;
 }
 
@@ -28,6 +30,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
   defaultType = 'egreso',
   defaultCategoryId,
   defaultSubcategory,
+  defaultAmount,
   currencySymbol,
 }) => {
   const [type, setType] = useState<TransactionType>(defaultType);
@@ -54,7 +57,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
       setReceiptNumber(editingTransaction.receiptNumber || '');
     } else {
       setType(defaultType);
-      setAmount('');
+      setAmount(defaultAmount ?? '');
       setPaymentMethod('transferencia');
       setDate(defaultDate || getTodayDateString());
       setDescription('');
@@ -76,7 +79,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
         setSubcategory('');
       }
     }
-  }, [editingTransaction, isOpen, defaultDate, defaultType, defaultCategoryId, defaultSubcategory, categories]);
+  }, [editingTransaction, isOpen, defaultDate, defaultType, defaultCategoryId, defaultSubcategory, defaultAmount, categories]);
 
   // When type changes, adjust available categories
   const handleTypeChange = (newType: TransactionType) => {
