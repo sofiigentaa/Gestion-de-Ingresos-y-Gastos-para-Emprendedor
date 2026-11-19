@@ -55,6 +55,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
     } else {
       setType(defaultType);
       setAmount('');
+      setPaymentMethod('transferencia');
       setDate(defaultDate || getTodayDateString());
       setDescription('');
       setSupplierOrClient('');
