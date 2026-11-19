@@ -81,6 +81,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
   // When type changes, adjust available categories
   const handleTypeChange = (newType: TransactionType) => {
     setType(newType);
+    setCustomSubcategory('');
     const available = categories.filter((c) => c.type === newType);
     if (available.length > 0) {
       setCategoryId(available[0].id);
@@ -95,6 +96,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
 
   const handleCategorySelect = (cat: CategoryOption) => {
     setCategoryId(cat.id);
+    setCustomSubcategory('');
     if (cat.subcategories.length > 0) {
       setSubcategory(cat.subcategories[0]);
     } else {
