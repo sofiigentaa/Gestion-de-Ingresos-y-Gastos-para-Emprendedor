@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Transaction, CategoryOption, TransactionType } from '../types';
-import { formatCurrency, formatDateSpanish, formatFullDateSpanish, getTodayDateString } from '../utils/formatters';
+import { formatCurrency, formatDateSpanish, formatFullDateSpanish, getTodayDateString, toDateKey } from '../utils/formatters';
 import { CategoryIcon } from './CategoryIcon';
 import { 
   ChevronLeft, 
@@ -55,7 +55,7 @@ export const DailyView: React.FC<DailyViewProps> = ({
     const [year, month, day] = selectedDate.split('-').map(Number);
     const d = new Date(year, month - 1, day);
     d.setDate(d.getDate() - 1);
-    const newDate = d.toISOString().split('T')[0];
+    const newDate = toDateKey(d);
     onDateChange(newDate);
     setViewYearMonth(newDate.slice(0, 7));
   };
@@ -64,7 +64,7 @@ export const DailyView: React.FC<DailyViewProps> = ({
     const [year, month, day] = selectedDate.split('-').map(Number);
     const d = new Date(year, month - 1, day);
     d.setDate(d.getDate() + 1);
-    const newDate = d.toISOString().split('T')[0];
+    const newDate = toDateKey(d);
     onDateChange(newDate);
     setViewYearMonth(newDate.slice(0, 7));
   };

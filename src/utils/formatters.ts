@@ -75,3 +75,8 @@ export function getCurrentMonthKey(): string {
   const month = String(d.getMonth() + 1).padStart(2, '0');
   return `${year}-${month}`;
 }
+
+// Fecha local en formato AAAA-MM-DD (toISOString usa UTC y corre el día en zonas al este de UTC).
+export function toDateKey(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
