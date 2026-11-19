@@ -164,6 +164,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
           <button
             onClick={onClose}
             id="btn-close-modal"
+            aria-label="Cerrar ventana"
             className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 rounded-full transition-colors"
           >
             <X className="w-5 h-5" />

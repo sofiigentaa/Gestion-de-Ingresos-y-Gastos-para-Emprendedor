@@ -94,6 +94,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
           </div>
           <button
             onClick={onClose}
+            aria-label="Cerrar ventana"
             className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 rounded-full"
           >
             <X className="w-5 h-5" />
