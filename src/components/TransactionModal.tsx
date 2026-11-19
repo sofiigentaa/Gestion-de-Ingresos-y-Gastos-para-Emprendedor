@@ -206,7 +206,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
           {/* Amount & Date */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider">
+              <label htmlFor="input-transaction-amount" className="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider">
                 Monto ({currencySymbol}) *
               </label>
               <div className="relative">
@@ -228,7 +228,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider">
+              <label htmlFor="input-transaction-date" className="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider">
                 Fecha del Movimiento *
               </label>
               <div className="relative">
@@ -340,7 +340,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
 
           {/* Description */}
           <div>
-            <label className="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider">
+            <label htmlFor="input-transaction-desc" className="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider">
               Descripción / Concepto
             </label>
             <div className="relative">
@@ -363,7 +363,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
           {/* Payment Method, Supplier/Client & Receipt */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider">
+              <label htmlFor="select-payment-method" className="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider">
                 Método de Pago
               </label>
               <select
@@ -382,7 +382,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider">
+              <label htmlFor="input-supplier-client" className="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider">
                 {type === 'egreso' ? 'Proveedor / Negocio' : 'Cliente / Comprador'}
               </label>
               <div className="relative">
@@ -399,7 +399,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider">
+              <label htmlFor="input-receipt-num" className="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider">
                 N° Ticket / Factura (Opcional)
               </label>
               <input

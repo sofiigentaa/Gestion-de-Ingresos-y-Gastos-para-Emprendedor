@@ -482,12 +482,12 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
               {/* Concept / Detail */}
               <div className="space-y-1">
-                <label className="text-[11px] font-bold text-indigo-300 uppercase tracking-widest">
+                <label htmlFor="quick-desc" className="text-[11px] font-bold text-indigo-300 uppercase tracking-widest">
                   Concepto / Detalle
                 </label>
                 <input 
                   type="text" 
-                  value={quickDesc}
+                  id="quick-desc" value={quickDesc}
                   onChange={(e) => setQuickDesc(e.target.value)}
                   placeholder={quickType === 'egreso' ? 'Ej: Madera MDF, Vinilo, Cola, Tornillos' : 'Ej: Venta en feria, Pedido'}
                   className="w-full bg-indigo-950/70 border border-indigo-800/80 rounded-xl p-3 text-sm text-white placeholder-indigo-400/70 focus:outline-none focus:ring-2 focus:ring-indigo-400"
@@ -496,11 +496,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
               {/* Category */}
               <div className="space-y-1">
-                <label className="text-[11px] font-bold text-indigo-300 uppercase tracking-widest">
+                <label htmlFor="quick-category" className="text-[11px] font-bold text-indigo-300 uppercase tracking-widest">
                   Categoría
                 </label>
                 <select 
-                  value={quickCategoryId}
+                  id="quick-category" value={quickCategoryId}
                   onChange={(e) => setQuickCategoryId(e.target.value)}
                   className="w-full bg-indigo-950/70 border border-indigo-800/80 rounded-xl p-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-400 cursor-pointer"
                 >
@@ -515,24 +515,24 @@ export const Dashboard: React.FC<DashboardProps> = ({
               {/* Amount & Payment Method */}
               <div className="grid grid-cols-2 gap-3 items-start">
                 <div className="space-y-1.5 flex flex-col">
-                  <label className="text-[11px] font-bold text-indigo-300 uppercase tracking-wider whitespace-nowrap h-5 flex items-center">
+                  <label htmlFor="quick-amount" className="text-[11px] font-bold text-indigo-300 uppercase tracking-wider whitespace-nowrap h-5 flex items-center">
                     Monto ({currencySymbol})
                   </label>
                   <input 
                     type="number" 
                     step="any"
-                    value={quickAmount}
+                    id="quick-amount" value={quickAmount}
                     onChange={(e) => setQuickAmount(e.target.value)}
                     placeholder="0"
                     className="h-11 w-full bg-indigo-950/70 border border-indigo-800/80 rounded-xl px-3 text-white placeholder-indigo-400/70 focus:outline-none focus:ring-2 focus:ring-indigo-400 font-mono text-sm font-bold"
                   />
                 </div>
                 <div className="space-y-1.5 flex flex-col">
-                  <label className="text-[11px] font-bold text-indigo-300 uppercase tracking-wider whitespace-nowrap h-5 flex items-center">
+                  <label htmlFor="quick-payment" className="text-[11px] font-bold text-indigo-300 uppercase tracking-wider whitespace-nowrap h-5 flex items-center">
                     Medio de Pago
                   </label>
                   <select 
-                    value={quickPaymentMethod}
+                    id="quick-payment" value={quickPaymentMethod}
                     onChange={(e) => setQuickPaymentMethod(e.target.value as PaymentMethod)}
                     className="h-11 w-full bg-indigo-950/70 border border-indigo-800/80 rounded-xl px-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-400 cursor-pointer"
                   >
