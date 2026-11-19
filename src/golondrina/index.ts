@@ -172,11 +172,14 @@ export class Golondrina {
     if (!accion) return 'No encontré esa acción.'
     if (!accionAplica(accion, this.ctx)) return `Ahora mismo no puedo «${tituloDe(accion, parametros)}» desde acá.`
     this.ejecutando++
+    // Copia: la acción puede completar parámetros (rubro) o marcar '_sinRegistro' sin tocar la memoria.
+    const p: Parametros = { ...parametros }
     try {
-      const resultado = await accion.ejecutar(parametros, this.ctx)
+      const resultado = await accion.ejecutar(p, this.ctx)
       this.ejecutando--
-      this.registrar(accionId, parametros, via)
-      return resultado || `Listo: ${tituloDe(accion, parametros)}.`
+      // Una acción que solo abrió un formulario (no guardó nada) no cuenta como hecha.
+      if (p['_sinRegistro'] !== '1') this.registrar(accionId, p, via)
+      return resultado || `Listo: ${tituloDe(accion, p)}.`
     } catch (error) {
       this.ejecutando--
       return `No pude completarlo: ${error instanceof Error ? error.message : 'error inesperado'}.`

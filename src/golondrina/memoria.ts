@@ -221,6 +221,8 @@ export class Memoria {
 
   aprenderFrase(frase: string, accion: string, parametros: Parametros) {
     if (!frase) return
+    // RN-10: la memoria no guarda montos. Una frase con cifras ("anotá 9.871 por lo de ayer") los llevaría adentro.
+    if (/\d/.test(frase)) return
     const previa = this.estado.frases[frase]
     this.estado.frases[frase] = { accion, parametros, veces: (previa?.accion === accion ? previa.veces : 0) + 1 }
     this.guardar()

@@ -196,6 +196,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
             <input
               type="text"
               placeholder="Buscar por concepto o proveedor..."
+              aria-label="Buscar movimientos"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400"
@@ -206,6 +207,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
           <div>
             <select
               value={typeFilter}
+              aria-label="Tipo de movimiento"
               onChange={(e) => setTypeFilter(e.target.value as any)}
               className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-slate-50 text-slate-700 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400"
             >
@@ -219,6 +221,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
           <div>
             <select
               value={categoryFilter}
+              aria-label="Categoría"
               onChange={(e) => {
                 const cat = categories.find((c) => c.id === e.target.value);
                 if (cat) asistente.registrar('filtrar', { rubro: cat.name });
@@ -239,6 +242,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
           <div>
             <select
               value={paymentFilter}
+              aria-label="Medio de pago"
               onChange={(e) => setPaymentFilter(e.target.value)}
               className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-slate-50 text-slate-700 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400"
             >
@@ -248,6 +252,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
               <option value="mercado_pago">Mercado Pago</option>
               <option value="tarjeta_debito">Tarjeta Débito</option>
               <option value="tarjeta_credito">Tarjeta Crédito</option>
+              <option value="otro">Otro medio</option>
             </select>
           </div>
         </div>
@@ -286,6 +291,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
             <span className="text-slate-500 font-medium">Ordenar:</span>
             <select
               value={sortBy}
+              aria-label="Ordenar movimientos"
               onChange={(e) => setSortBy(e.target.value as any)}
               className="px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-400 font-medium"
             >

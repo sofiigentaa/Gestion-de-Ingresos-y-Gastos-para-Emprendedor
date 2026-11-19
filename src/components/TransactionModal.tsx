@@ -15,6 +15,8 @@ interface TransactionModalProps {
   /** Rubro ya elegido (lo usa el asistente Golondrina). */
   defaultCategoryId?: string;
   defaultSubcategory?: string;
+  /** Monto ya dicho (lo usa el asistente Golondrina). */
+  defaultAmount?: string;
   currencySymbol: string;
 }
 
@@ -28,6 +30,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
   defaultType = 'egreso',
   defaultCategoryId,
   defaultSubcategory,
+  defaultAmount,
   currencySymbol,
 }) => {
   const [type, setType] = useState<TransactionType>(defaultType);
@@ -54,7 +57,8 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
       setReceiptNumber(editingTransaction.receiptNumber || '');
     } else {
       setType(defaultType);
-      setAmount('');
+      setAmount(defaultAmount ?? '');
+      setPaymentMethod('transferencia');
       setDate(defaultDate || getTodayDateString());
       setDescription('');
       setSupplierOrClient('');
@@ -75,11 +79,12 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
         setSubcategory('');
       }
     }
-  }, [editingTransaction, isOpen, defaultDate, defaultType, defaultCategoryId, defaultSubcategory, categories]);
+  }, [editingTransaction, isOpen, defaultDate, defaultType, defaultCategoryId, defaultSubcategory, defaultAmount, categories]);
 
   // When type changes, adjust available categories
   const handleTypeChange = (newType: TransactionType) => {
     setType(newType);
+    setCustomSubcategory('');
     const available = categories.filter((c) => c.type === newType);
     if (available.length > 0) {
       setCategoryId(available[0].id);
@@ -94,6 +99,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
 
   const handleCategorySelect = (cat: CategoryOption) => {
     setCategoryId(cat.id);
+    setCustomSubcategory('');
     if (cat.subcategories.length > 0) {
       setSubcategory(cat.subcategories[0]);
     } else {
@@ -140,6 +146,9 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs overflow-y-auto">
       <div 
         id="transaction-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-label={editingTransaction ? 'Editar Movimiento' : 'Registrar Nuevo Movimiento'}
         className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden my-6 max-h-[90vh] flex flex-col"
       >
         {/* Modal Header */}
@@ -155,6 +164,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
           <button
             onClick={onClose}
             id="btn-close-modal"
+            aria-label="Cerrar ventana"
             className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 rounded-full transition-colors"
           >
             <X className="w-5 h-5" />
@@ -196,7 +206,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
           {/* Amount & Date */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider">
+              <label htmlFor="input-transaction-amount" className="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider">
                 Monto ({currencySymbol}) *
               </label>
               <div className="relative">
@@ -218,7 +228,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider">
+              <label htmlFor="input-transaction-date" className="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider">
                 Fecha del Movimiento *
               </label>
               <div className="relative">
@@ -330,7 +340,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
 
           {/* Description */}
           <div>
-            <label className="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider">
+            <label htmlFor="input-transaction-desc" className="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider">
               Descripción / Concepto
             </label>
             <div className="relative">
@@ -353,7 +363,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
           {/* Payment Method, Supplier/Client & Receipt */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider">
+              <label htmlFor="select-payment-method" className="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider">
                 Método de Pago
               </label>
               <select
@@ -372,7 +382,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider">
+              <label htmlFor="input-supplier-client" className="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider">
                 {type === 'egreso' ? 'Proveedor / Negocio' : 'Cliente / Comprador'}
               </label>
               <div className="relative">
@@ -389,7 +399,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider">
+              <label htmlFor="input-receipt-num" className="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider">
                 N° Ticket / Factura (Opcional)
               </label>
               <input

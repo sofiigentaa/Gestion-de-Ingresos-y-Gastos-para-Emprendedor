@@ -121,7 +121,16 @@ export const CategoryBreakdown: React.FC<CategoryBreakdownProps> = ({
           return (
             <div
               key={cat.id}
+              role="button"
+              tabIndex={0}
+              aria-pressed={isSelected}
               onClick={() => setSelectedCategoryTab(isSelected ? 'all_expenses' : cat.id)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setSelectedCategoryTab(isSelected ? 'all_expenses' : cat.id);
+                }
+              }}
               className={`bg-white rounded-3xl p-5 sm:p-6 border transition-all cursor-pointer relative overflow-hidden ${
                 isSelected
                   ? 'border-indigo-500 ring-2 ring-indigo-500/20 shadow-md'

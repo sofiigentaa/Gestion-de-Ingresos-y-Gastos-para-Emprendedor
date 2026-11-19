@@ -93,7 +93,10 @@ function localDateStamp(): string {
 }
 
 function csvText(value: unknown): string {
-  return `"${String(value ?? '').replace(/"/g, '""')}"`;
+  const texto = String(value ?? '');
+  // Excel y Calc leen como fórmula lo que empieza con = + - @: se antepone un apóstrofo.
+  const seguro = /^[=+\-@\t\r]/.test(texto) ? `'${texto}` : texto;
+  return `"${seguro.replace(/"/g, '""')}"`;
 }
 
 export function exportTransactionsToCSV(transactions: Transaction[]): void {

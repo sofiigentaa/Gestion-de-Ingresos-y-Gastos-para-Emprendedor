@@ -79,8 +79,9 @@ export function extraerMonto(texto: string): number | null {
   if (!m) return null;
   let valor = Number(m[1].replace(/\./g, '') + (m[2] ? `.${m[2]}` : ''));
   const mult = m[3] ?? '';
-  if (/^(mil|k|luca)/.test(mult)) valor *= 1000;
+  // "millones" empieza con "mil": se prueba primero para no aplicar los dos multiplicadores.
   if (/^(millon|palo)/.test(mult)) valor *= 1_000_000;
+  else if (/^(mil|k|luca)/.test(mult)) valor *= 1000;
   return valor > 0 ? valor : null;
 }
 
