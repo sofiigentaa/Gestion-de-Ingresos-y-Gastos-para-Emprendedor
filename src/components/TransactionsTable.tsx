@@ -248,6 +248,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
               <option value="mercado_pago">Mercado Pago</option>
               <option value="tarjeta_debito">Tarjeta Débito</option>
               <option value="tarjeta_credito">Tarjeta Crédito</option>
+              <option value="otro">Otro medio</option>
             </select>
           </div>
         </div>
