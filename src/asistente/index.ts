@@ -203,7 +203,7 @@ export function accionesDeFinanzas(e: EstadoFinanzas): Accion[] {
         const comp = previo.delMes.length
           ? `\nEl mes anterior la ganancia fue ${pesos(previo.neta)} (${r.neta >= previo.neta ? 'vas mejor' : 'venías mejor'}).`
           : '';
-        return `${getMonthLabel(mes)}:\n• Entró ${pesos(r.ingresos)}\n• Salió ${pesos(r.egresos)}\n• Ganancia neta ${pesos(r.neta)} (margen ${r.margen.toFixed(0)}%)${comp}`;
+        return `${getMonthLabel(mes)}:\n• Entró ${pesos(r.ingresos)}\n• Salió ${pesos(r.egresos)}\n• Ganancia neta ${pesos(r.neta)} (margen ${r.margen.toFixed(1)}%)${comp}`;
       },
     },
     {
