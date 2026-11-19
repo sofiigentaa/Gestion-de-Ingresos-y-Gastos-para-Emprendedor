@@ -161,7 +161,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
     e.preventDefault();
     const amountNum = parseFloat(quickAmount);
     if (isNaN(amountNum) || amountNum <= 0) {
-      alert('Por favor ingrese un monto válido');
+      alert('Por favor ingrese un monto válido mayor a 0');
       return;
     }
     const cat = categories.find((c) => c.id === quickCategoryId) || availableQuickCats[0];
