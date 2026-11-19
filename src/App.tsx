@@ -772,6 +772,7 @@ export default function App() {
         onResetToEmpty={handleResetToEmpty}
         onResetToSample={handleResetToSample}
         onResetCategories={handleResetCategories}
+        totalTransactionsCount={transactions.length}
       />
 
       {/* Printable Report View (Visible only during print preview) */}
