@@ -102,6 +102,7 @@ export function accionesDeFinanzas(e: EstadoFinanzas): Accion[] {
     const nombre = tipo === 'ingreso' ? 'ingreso' : 'gasto';
 
     if (!mov.monto || !categoria) {
+      p['_sinRegistro'] = '1'; // solo abre el formulario: Golondrina aprende cuando se guarda
       e.abrirFormulario(tipo, categoria?.id, sub, mov.monto ?? undefined);
       if (!categoria && mov.monto) return `Te abrí el formulario de ${nombre} por ${pesos(mov.monto)}: elegí el rubro y guardá.`;
       return categoria
