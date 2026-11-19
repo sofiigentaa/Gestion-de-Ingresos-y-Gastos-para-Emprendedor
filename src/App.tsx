@@ -154,7 +154,7 @@ export default function App() {
     setEditingTransaction(null);
     setModalDefaultCategory(null);
     setModalDefaultType(type);
-    setModalDefaultDate(customDate || selectedDate || getTodayDateString());
+    setModalDefaultDate(customDate || getTodayDateString());
     setIsTxModalOpen(true);
   };
 
@@ -162,7 +162,7 @@ export default function App() {
     setEditingTransaction(null);
     setModalDefaultCategory(categoryId ? { id: categoryId } : null);
     setModalDefaultType(type);
-    setModalDefaultDate(selectedDate || getTodayDateString());
+    setModalDefaultDate(getTodayDateString());
     setIsTxModalOpen(true);
   };
 
